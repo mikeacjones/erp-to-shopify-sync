@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:shopify="http://www.mulesoft.org/schema/mule/shopify"
+	xmlns:productss-api="http://www.mulesoft.org/schema/mule/productss-api"
+	xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd
+http://www.mulesoft.org/schema/mule/productss-api http://www.mulesoft.org/schema/mule/productss-api/current/mule-productss-api.xsd
+http://www.mulesoft.org/schema/mule/shopify http://www.mulesoft.org/schema/mule/shopify/current/mule-shopify.xsd">
+	<anypoint-mq:config name="Anypoint_MQ_Config"
+		doc:name="Anypoint MQ Config"
+		doc:id="97b04c75-6713-4e7c-ba37-6c5cc563c15f">
+		<anypoint-mq:connection
+			clientId="${anypoint.mq.client_id}"
+			clientSecret="${anypoint.mq.client_secret}" />
+	</anypoint-mq:config>
+	<productss-api:config name="Products_sAPI_Config"
+		doc:name="Products sAPI Config"
+		doc:id="068c650c-c623-4a80-a281-dd98352526df"
+		property_authorization="Bearer ${erp.token}"
+		property_host="${erp.host}" />
+	<shopify:config name="Shopify_Config"
+		doc:name="Shopify Config"
+		doc:id="60850dd5-5625-469e-a800-a5879b1f87c9"
+		property_host="american-textile-company-dev.myshopify.com"
+		property_port="443" property_protocol="HTTPS"
+		property_username="${shopify.username}"
+		property_password="${shopify.password}" />
+</mule>

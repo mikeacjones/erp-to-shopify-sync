@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="inventory-item" format="json">
+      <types:shape format="weave" example="examples/inventory-item.json"><![CDATA[%dw 2.0
+
+type inventory_item = {|
+  sku: String, 
+  locationId: String, 
+  inventoryLevelId: String, 
+  available: Number {"typeId": "int"}, 
+  inventoryItemID: String
+|} {"example": "{\\\"sku\\\":\\\"28414ATC\\\",\\\"locationId\\\":\\\"60285452467\\\",\\\"inventoryLevelId\\\":\\\"94506188979\\\",\\\"available\\\":16,\\\"inventoryItemID\\\":\\\"41583595454643\\\"}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#812ac662-c61e-4030-bec9-fc09ee3b0e01">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="inventory-item"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

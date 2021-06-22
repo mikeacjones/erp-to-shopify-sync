@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:shopify="http://www.mulesoft.org/schema/mule/shopify"
+	xmlns:productss-api="http://www.mulesoft.org/schema/mule/productss-api"
+	xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd
+http://www.mulesoft.org/schema/mule/productss-api http://www.mulesoft.org/schema/mule/productss-api/current/mule-productss-api.xsd
+http://www.mulesoft.org/schema/mule/shopify http://www.mulesoft.org/schema/mule/shopify/current/mule-shopify.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="erp-to-shopify-syncFlow"
+		doc:id="30ba1cd8-72b1-432b-b907-a85d91fe2308">
+		<anypoint-mq:subscriber doc:name="Subscriber"
+			doc:id="812ac662-c61e-4030-bec9-fc09ee3b0e01"
+			config-ref="Anypoint_MQ_Config" destination="inventory-sync-queue" />
+		<productss-api:get-product-info-by-customer-sku
+			doc:name="Get Product Info by Customer SKU"
+			doc:id="20f331b9-5c3b-4ab0-a4de-891022f0297f"
+			config-ref="Products_sAPI_Config" customer="ATCDTC"
+			sku="#[payload.sku]" warehouse='#["GC,GP"]' target="erpData" />
+		<ee:transform doc:name="build adjustment body"
+			doc:id="ee05577e-19a1-413a-b5b1-fe67ea7d2cb9">
+			<ee:message>
+				<ee:set-payload resource="adjustmentRequestBody.dwl" />
+			</ee:message>
+		</ee:transform>
+		<shopify:adjust-available-inventory
+			doc:name="Adjust Available Inventory"
+			doc:id="f9be2ee8-c0ee-4650-ba93-19c54b2ae767"
+			config-ref="Shopify_Config" />
+	</flow>
+</mule>

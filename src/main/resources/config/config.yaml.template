@@ -1,0 +1,11 @@
+anypoint:
+  mq:
+    client_id: ""
+    client_secret: ""
+shopify:
+  username: ""
+  password: ""
+  host: ""
+erp:
+  host: ""
+  token: ""

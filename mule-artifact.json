@@ -1,0 +1,10 @@
+{
+  "minMuleVersion": "4.3.0",
+  "secureProperties": [
+  	"anypoint.mq.client_id",
+  	"anypoint.mq.client_secret",
+  	"shopify.username",
+  	"shopify.password",
+  	"erp.token"
+  ]
+}
