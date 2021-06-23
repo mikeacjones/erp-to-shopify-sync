@@ -15,7 +15,7 @@ http://www.mulesoft.org/schema/mule/shopify http://www.mulesoft.org/schema/mule/
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 	<flow name="erp-to-shopify-syncFlow"
-		doc:id="30ba1cd8-72b1-432b-b907-a85d91fe2308" maxConcurrency="1">
+		doc:id="30ba1cd8-72b1-432b-b907-a85d91fe2308"> 
 		<anypoint-mq:subscriber doc:name="Subscriber"
 			doc:id="812ac662-c61e-4030-bec9-fc09ee3b0e01"
 			config-ref="Anypoint_MQ_Config" destination="inventory-sync-queue" />
