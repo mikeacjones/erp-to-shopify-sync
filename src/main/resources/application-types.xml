@@ -1,16 +1,14 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
   <types:catalog>
-    <types:type name="inventory-item" format="json">
-      <types:shape format="weave" example="examples/inventory-item.json"><![CDATA[%dw 2.0
+    <types:type name="queueSample" format="json">
+      <types:shape format="weave" example="examples/sampleQueueData.json"><![CDATA[%dw 2.0
 
-type inventory_item = {|
-  sku: String, 
-  locationId: String, 
-  inventoryLevelId: String, 
+type queueSample = {|
+  id: String, 
   available: Number {"typeId": "int"}, 
-  inventoryItemID: String
-|} {"example": "{\\\"sku\\\":\\\"28414ATC\\\",\\\"locationId\\\":\\\"60285452467\\\",\\\"inventoryLevelId\\\":\\\"94506188979\\\",\\\"available\\\":16,\\\"inventoryItemID\\\":\\\"41583595454643\\\"}"}
+  sku: String
+|} {"example": "{\\\"id\\\":\\\"gid:\\/\\/shopify\\/InventoryLevel\\/97925365931?inventory_item_id=42251931189419\\\",\\\"available\\\":3,\\\"sku\\\":\\\"6326ATC\\\"}"}
 
 ]]></types:shape>
     </types:type>
@@ -19,7 +17,7 @@ type inventory_item = {|
     <types:processor-declaration>
       <types:output-event>
         <types:message>
-          <types:payload type="inventory-item"/>
+          <types:payload type="queueSample"/>
         </types:message>
       </types:output-event>
     </types:processor-declaration>

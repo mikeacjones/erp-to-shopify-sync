@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:shopify="http://www.mulesoft.org/schema/mule/shopify"
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:shopify="http://www.mulesoft.org/schema/mule/shopify"
 	xmlns:productss-api="http://www.mulesoft.org/schema/mule/productss-api"
 	xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
 	xmlns="http://www.mulesoft.org/schema/mule/core"
@@ -9,7 +10,8 @@
 	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd
 http://www.mulesoft.org/schema/mule/productss-api http://www.mulesoft.org/schema/mule/productss-api/current/mule-productss-api.xsd
-http://www.mulesoft.org/schema/mule/shopify http://www.mulesoft.org/schema/mule/shopify/current/mule-shopify.xsd">
+http://www.mulesoft.org/schema/mule/shopify http://www.mulesoft.org/schema/mule/shopify/current/mule-shopify.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 	<anypoint-mq:config name="Anypoint_MQ_Config"
 		doc:name="Anypoint MQ Config"
 		doc:id="97b04c75-6713-4e7c-ba37-6c5cc563c15f">
@@ -29,4 +31,15 @@ http://www.mulesoft.org/schema/mule/shopify http://www.mulesoft.org/schema/mule/
 		property_port="443" property_protocol="HTTPS"
 		property_username="${shopify.username}"
 		property_password="${shopify.password}" />
+	<http:request-config name="Shopify-Request"
+		doc:name="HTTP Request configuration"
+		doc:id="36f0a366-7812-4457-9796-19b3a61386c6">
+		<http:request-connection protocol="HTTPS"
+			host="${shopify.host}" port="443" streamResponse="true">
+			<http:authentication>
+				<http:basic-authentication
+					username="${shopify.username}" password="${shopify.password}" />
+			</http:authentication>
+		</http:request-connection>
+	</http:request-config>
 </mule>

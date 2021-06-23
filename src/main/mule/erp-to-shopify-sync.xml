@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
 	xmlns:shopify="http://www.mulesoft.org/schema/mule/shopify"
 	xmlns:productss-api="http://www.mulesoft.org/schema/mule/productss-api"
 	xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
@@ -11,26 +12,58 @@
 http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd
 http://www.mulesoft.org/schema/mule/productss-api http://www.mulesoft.org/schema/mule/productss-api/current/mule-productss-api.xsd
 http://www.mulesoft.org/schema/mule/shopify http://www.mulesoft.org/schema/mule/shopify/current/mule-shopify.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 	<flow name="erp-to-shopify-syncFlow"
-		doc:id="30ba1cd8-72b1-432b-b907-a85d91fe2308">
+		doc:id="30ba1cd8-72b1-432b-b907-a85d91fe2308" maxConcurrency="1">
 		<anypoint-mq:subscriber doc:name="Subscriber"
 			doc:id="812ac662-c61e-4030-bec9-fc09ee3b0e01"
 			config-ref="Anypoint_MQ_Config" destination="inventory-sync-queue" />
-		<productss-api:get-product-info-by-customer-sku
-			doc:name="Get Product Info by Customer SKU"
-			doc:id="20f331b9-5c3b-4ab0-a4de-891022f0297f"
-			config-ref="Products_sAPI_Config" customer="ATCDTC"
-			sku="#[payload.sku]" warehouse='#["GC,GP"]' target="erpData" />
-		<ee:transform doc:name="build adjustment body"
-			doc:id="ee05577e-19a1-413a-b5b1-fe67ea7d2cb9">
-			<ee:message>
-				<ee:set-payload resource="adjustmentRequestBody.dwl" />
-			</ee:message>
-		</ee:transform>
-		<shopify:adjust-available-inventory
-			doc:name="Adjust Available Inventory"
-			doc:id="f9be2ee8-c0ee-4650-ba93-19c54b2ae767"
-			config-ref="Shopify_Config" />
+		<until-successful maxRetries="5"
+			doc:name="Until Successful"
+			doc:id="fae7e7ea-5c73-460c-a8ed-b695ef8bfda8"
+			millisBetweenRetries="15000">
+			<try doc:name="Try" doc:id="bb8a4104-5445-498c-86c3-671cc0d179bb">
+				<productss-api:get-product-info-by-customer-sku
+					doc:name="Get Product Info by Customer SKU"
+					doc:id="20f331b9-5c3b-4ab0-a4de-891022f0297f"
+					config-ref="Products_sAPI_Config" customer="ATCDTC"
+					sku="#[payload.sku]" warehouse='#["GC,GP"]' target="erpData" />
+				<ee:transform doc:name="build adjustment body"
+					doc:id="ee05577e-19a1-413a-b5b1-fe67ea7d2cb9">
+					<ee:message>
+						<ee:set-payload
+							resource="adjustmentRequestBody.dwl" />
+					</ee:message>
+				</ee:transform>
+				<choice doc:name="Choice"
+					doc:id="43e101e1-e70b-4517-bdda-4ad4f95332d0">
+					<when
+						expression='#[payload.variables."input".availableDelta != 0]'>
+						<http:request method="POST"
+							doc:name="make inventory adjustment"
+							doc:id="93fbd148-75a6-4b37-a307-c65c99713cba"
+							config-ref="Shopify-Request"
+							path="/admin/api/2021-04/graphql.json"
+							requestStreamingMode="AUTO" />
+					</when>
+				</choice>
+				<error-handler>
+					<on-error-continue enableNotifications="false"
+						logException="false" doc:name="On Error Continue"
+						doc:id="35201702-91d6-43b5-84aa-8c4ff7578cce"
+						type="HTTP:NOT_FOUND, PRODUCTSS-API:NOT_FOUND">
+						<anypoint-mq:publish doc:name="Publish"
+							doc:id="99a9c827-bec3-4ec6-93f1-94cdd1f0ad35"
+							config-ref="Anypoint_MQ_Config"
+							destination="inventory-sync-not-found">
+							<anypoint-mq:body><![CDATA[#[output application/json
+---
+payload]]]></anypoint-mq:body>
+						</anypoint-mq:publish>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</until-successful>
 	</flow>
 </mule>
